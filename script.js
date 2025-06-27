@@ -2,8 +2,9 @@ const gridContainer = document.querySelector('.grid-container');
 const startBtn = document.getElementById('startBtn');
 const clientSeedInput = document.getElementById('client-seed');
 let gridSize = 5; // Default grid size
+let activeDiamondIndexes = []; // To store current diamonds
 
-// Setup Grid
+// Function to set up the grid
 function setupGrid(size) {
   gridSize = size;
   gridContainer.innerHTML = "";
@@ -12,9 +13,9 @@ function setupGrid(size) {
   gridContainer.style.gridTemplateRows = `repeat(${size}, minmax(0, 1fr))`;
 
   for (let i = 0; i < size * size; i++) {
-    const gridItem = document.createElement('div');
-    gridItem.classList.add('grid-item');
-    gridContainer.appendChild(gridItem);
+    const cell = document.createElement('div');
+    cell.classList.add('grid-item');
+    gridContainer.appendChild(cell);
   }
 
   // Update active button UI
@@ -29,58 +30,68 @@ function setupGrid(size) {
 // Get 5 unique random indexes
 function getRandomItems() {
   const total = gridSize * gridSize;
-  const randomIndexes = new Set();
-  while (randomIndexes.size < 5) {
-    randomIndexes.add(Math.floor(Math.random() * total));
+  const set = new Set();
+  while (set.size < 5) {
+    set.add(Math.floor(Math.random() * total));
   }
-  return Array.from(randomIndexes);
+  return Array.from(set);
 }
 
-// Show diamonds and reset after 15s
-function changeGridItems() {
-  const randomIndexes = getRandomItems();
-  randomIndexes.forEach(index => {
+// Play the game round
+function startGame() {
+  const seed = clientSeedInput.value.trim();
+  if (!seed) {
+    alert("Please enter a client seed before starting the game.");
+    return;
+  }
+
+  // Play sound
+  play();
+
+  // Reset previous diamonds if any
+  clearDiamonds();
+
+  // Get 5 new random diamond positions
+  activeDiamondIndexes = getRandomItems();
+  activeDiamondIndexes.forEach(index => {
     gridContainer.children[index].classList.add('diamond');
   });
 
-  setTimeout(() => {
-    randomIndexes.forEach(index => {
-      gridContainer.children[index].classList.remove('diamond');
-    });
-  }, 15000);
-}
-
-// Disable and re-enable Start button
-function disable() {
-  const waitMsg = document.getElementById("wait");
-
-  waitMsg.innerHTML = "Wait for 20 sec For next round";
+  // Disable the start button and start countdown
+  let countdown = 20;
   startBtn.disabled = true;
+  startBtn.textContent = `Wait ${countdown}s...`;
 
-  setTimeout(() => {
-    startBtn.disabled = false;
-    waitMsg.innerHTML = "";
-  }, 15000);
+  const interval = setInterval(() => {
+    countdown--;
+    startBtn.textContent = `Wait ${countdown}s...`;
+
+    if (countdown <= 0) {
+      clearInterval(interval);
+      clearDiamonds();
+      startBtn.disabled = false;
+      startBtn.textContent = "Start Game";
+    }
+  }, 1000);
 }
 
-// Play audio
+// Clear all diamonds
+function clearDiamonds() {
+  activeDiamondIndexes.forEach(index => {
+    if (gridContainer.children[index]) {
+      gridContainer.children[index].classList.remove('diamond');
+    }
+  });
+  activeDiamondIndexes = [];
+}
+
+// Play sound
 function play() {
   const audio = document.getElementById("clickk");
   audio.play();
 }
 
-// Start Game button logic
-startBtn.addEventListener('click', () => {
-  changeGridItems();
-});
-
-// Monitor client seed input and enable/disable start button
-clientSeedInput.addEventListener('input', () => {
-  const seedValue = clientSeedInput.value.trim();
-  startBtn.disabled = seedValue === "";
-});
-
-// Save client seed
+// Save client seed to localStorage
 document.querySelector('.save-btn').addEventListener('click', () => {
   const seed = clientSeedInput.value.trim();
   if (seed) {
@@ -91,27 +102,36 @@ document.querySelector('.save-btn').addEventListener('click', () => {
   }
 });
 
-// Initialize grid and set button state
+// Enable or disable start button based on seed input
+clientSeedInput.addEventListener('input', () => {
+  startBtn.disabled = clientSeedInput.value.trim() === "";
+});
+
+// Attach event to Start button
+startBtn.addEventListener('click', startGame);
+
+// Initialize grid
 setupGrid(5);
 startBtn.disabled = true;
 
-
-window.onload = function() {
+// Auto-popup on load
+window.onload = function () {
   startCountdown();
 };
 
+// Telegram popup countdown logic
 function startCountdown() {
-  var popup = document.getElementById('telegramPopup');
-  var round = document.querySelector('.round');
-  var timer = 5; // seconds
+  const popup = document.getElementById('telegramPopup');
+  const roundDisplay = document.querySelector('.round');
+  let timer = 5;
 
-  var countdown = setInterval(function() {
-      if (timer <= 0) {
-          clearInterval(countdown);
-          popup.style.display = 'none';
-      } else {
-          round.textContent = timer;
-          timer--;
-      }
-  }, 1000); // 1 second interval
+  const interval = setInterval(() => {
+    if (timer <= 0) {
+      clearInterval(interval);
+      popup.style.display = 'none';
+    } else {
+      roundDisplay.textContent = timer;
+      timer--;
+    }
+  }, 1000);
 }
