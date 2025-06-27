@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Mines Predictor</title>
+  <link rel="stylesheet" href="style.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500&display=swap" rel="stylesheet">
+
+</head>
+<body>
+    <div class="game-title">Mines Predictor</div>
+
+  <div class="container">
+    <div class="input-group">
+      <input type="text" id="client-seed" placeholder="Enter client seed" />
+      <button class="save-btn">Save</button>
+    </div>
+  </div>
+
+  <div class="grid-buttons">
+    <button onclick="setupGrid(5)">25</button>
+    <button onclick="setupGrid(6)">36</button>
+  </div>
+
+  <div class="grid-container"></div>
+
+  <div><button onclick="disable(); play()" id="startBtn">Start Game</button></div>
+ 
+
+
+  <div id="telegramPopup" class="popup">
+    <div class="popup-content">
+        <h2 class="warn"> !!! WARNING !!!</h2>
+        <p>Please Read the instructions carefully before using HACK
+            <ol class="ins">
+              <li class="in">Gambling is for fun Don't get addicted.</li>
+              <li class="in">18+ only</li>
+                <li class="in">Create new account using the button below so that the hack will work with more efficiency.</li>
+                <li class="in">Winning Rate of this HACK is up to 90%.</li>
+                <li class="in">We are not taking any guarantee for your profit or loss I use HACK as most of the times I win myself using it.
+                </li>            </ol>
+        </p>
+        <div class="round">20</div>
+        <button id="joinTelegram" class="f-cont" onclick="window.open('https://roobet.com/?ref=mobroy7', '_blank');">Create Account</button>
+    </div>
+</div>
+
+
+
+  <audio id="clickk" src="ding.mp3"></audio>
+  <script src="script.js"></script>
+</body>
+</html>
